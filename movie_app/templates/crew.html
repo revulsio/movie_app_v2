@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block c %}
+<h2>Кинонд гишүүн бүртгэх</h2>
+<form method="post" class="card card-body" style="max-width:600px">
+  <label>Кино</label>
+  <input name="movie" id="movie" list="ml" class="form-control" autocomplete="off" required placeholder="Киноны нэрээр хайх" value="{{ request.args.get('movie','') }}">
+  <datalist id="ml"></datalist>
+  <label class="mt-3">Үүрэг</label>
+  <select name="role" id="role" class="form-select">
+    {% for k,v in ROLE_MN.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
+  </select>
+  <label class="mt-3">Хүн</label>
+  <input name="person" id="person" list="pl" class="form-control" autocomplete="off" required placeholder="Хүний нэрээр хайх">
+  <datalist id="pl"></datalist>
+  <div id="rl" class="mt-3"><label>Дүр (таслалаар тусгаарлана)</label><input name="roles" class="form-control"></div>
+  <button class="btn btn-primary mt-3 align-self-start">Нэмэх</button>
+</form>
+<script>
+function ac(inp, url){
+  const dl = document.getElementById(inp.getAttribute('list'));
+  inp.addEventListener('input', async () => {
+    const r = await fetch(url + encodeURIComponent(inp.value));
+    dl.innerHTML = (await r.json()).map(x => { const o = document.createElement('option'); o.value = x; return o.outerHTML; }).join('');
+  });
+}
+ac(document.getElementById('movie'), '/api/movies?q=');
+ac(document.getElementById('person'), '/api/people?q=');
+const role = document.getElementById('role'), rl = document.getElementById('rl');
+role.addEventListener('change', () => rl.style.display = role.value === 'ACTED_IN' ? '' : 'none');
+</script>{% endblock %}

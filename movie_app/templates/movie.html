@@ -1,0 +1,50 @@
+{% extends 'base.html' %}{% block c %}
+<div class="row">
+  <div class="col-md-4"><img class="img-fluid" src="{{ img_url(m.image) }}" alt=""></div>
+  <div class="col-md-8">
+    <h1 class="fw-bold">{{ m.title }}</h1><h4>{{ m.released }}</h4><p class="text-muted">{{ m.tagline or '' }}</p>
+    {% if user and user.role=='admin' %}
+    <div class="mb-3 d-flex gap-2">
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('movie_form', t=m.title) }}">Засах</a>
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('crew', movie=m.title) }}">Гишүүн нэмэх</a>
+      <form method="post" action="{{ url_for('movie_delete', t=m.title) }}" onsubmit="return confirm('Устгах уу?')">
+        <button class="btn btn-sm btn-danger">Устгах</button></form>
+    </div>{% endif %}
+    <table class="table">
+      {% for k,label in ROLE_PL.items() %}
+      <tr><th style="width:30%">{{ label }}:</th><td>
+        {% if crew[k] %}<ul class="mb-0">
+          {% for c in crew[k] %}<li><a href="{{ url_for('person', n=c.name) }}">{{ c.name }}</a>{% if c.roles %} [{{ c.roles|join(', ') }}]{% endif %}
+            {% if user and user.role=='admin' %}
+            <form class="d-inline" method="post" action="{{ url_for('crew_remove') }}">
+              <input type="hidden" name="movie" value="{{ m.title }}"><input type="hidden" name="person" value="{{ c.name }}">
+              <input type="hidden" name="rel" value="{{ k }}"><button class="btn btn-link btn-sm text-danger p-0" title="Хасах">✕</button></form>
+            {% endif %}</li>{% endfor %}
+        </ul>{% else %}<span class="text-muted">Мэдээлэл олдсонгүй</span>{% endif %}
+      </td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+
+<h3 class="mt-4">Үнэлгээ ба сэтгэгдэл</h3>
+<div class="fs-2 fw-bold mb-3">
+  {% if stat.avg %}★ {{ '%.1f'|format(stat.avg) }}<small class="fs-6 text-muted fw-normal"> / 5 ({{ stat.n }} үнэлгээ)</small>
+  {% else %}<span class="fs-6 text-muted fw-normal">Одоогоор хэрэглэгчийн үнэлгээ байхгүй</span>{% endif %}
+</div>
+{% if user %}
+<form method="post" action="{{ url_for('review', t=m.title) }}" class="card card-body mb-3" style="max-width:600px">
+  <label class="fw-bold">Таны үнэлгээ</label>
+  <select name="rating" class="form-select mb-2" style="width:auto">
+    {% for i in range(5,0,-1) %}<option value="{{ i }}" {% if mine and mine.rating==i %}selected{% endif %}>{{ '★'*i }} ({{ i }})</option>{% endfor %}
+  </select>
+  <textarea name="summary" class="form-control mb-2" rows="3" placeholder="Сэтгэгдэл бичих" required>{{ mine.summary if mine else '' }}</textarea>
+  <button class="btn btn-primary align-self-start">Хадгалах</button>
+</form>
+{% else %}<p>Сэтгэгдэл бичихийн тулд <a href="{{ url_for('login', next=request.path) }}">нэвтэрнэ үү</a>.</p>{% endif %}
+{% for r in reviews %}
+<div class="border rounded p-3 mb-2"><b>{{ r.who }}</b>
+  {% if r.isuser %}<span class="text-warning ms-2">{{ '★'*r.rating }}{{ '☆'*(5-r.rating) }}</span>
+  {% else %}<span class="badge bg-secondary ms-2">Шүүмжлэгч: {{ r.rating }}/100</span>{% endif %}
+  <div>{{ r.summary }}</div></div>
+{% else %}<p class="text-muted">Сэтгэгдэл байхгүй байна.</p>{% endfor %}
+{% endblock %}

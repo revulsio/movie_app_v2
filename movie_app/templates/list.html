@@ -1,0 +1,31 @@
+{% extends 'base.html' %}{% block c %}
+<div class="bg-light p-4 mb-4 rounded d-flex justify-content-between align-items-center">
+  <h1 class="h2 fw-bold m-0">{{ title }}</h1>
+  {% if user and user.role=='admin' %}<a class="btn btn-primary" href="{{ add }}">Нэмэх</a>{% endif %}
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <form class="card card-body mb-3">
+      <label class="fw-bold text-primary mb-1">{{ lq }}</label>
+      <input name="q" class="form-control mb-3" placeholder="{{ ph }}" value="{{ request.args.get('q','') }}">
+      <label class="fw-bold text-primary mb-1">{{ ly }}</label>
+      <div class="row g-2 mb-3">
+        <div class="col"><small>Эхлэх он</small><input type="number" name="y1" class="form-control" value="{{ request.args.get('y1','') }}"></div>
+        <div class="col"><small>Дуусах он</small><input type="number" name="y2" class="form-control" value="{{ request.args.get('y2','') }}"></div>
+      </div>
+      <button class="btn btn-primary">Хайх</button>
+    </form>
+  </div>
+  <div class="col-md-9">
+    <p class="text-muted border-bottom pb-2"><b>{{ items|length }}</b> {{ found }}</p>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+      {% for i in items %}
+      <div class="col"><div class="card h-100 p-3">
+        <img class="poster mb-2" src="{{ img_url(i.img) }}" alt="">
+        <div>{{ i.name }}</div><div class="fw-bold mb-3">{{ i.sub }}</div>
+        <a class="btn btn-primary mt-auto" href="{{ i.url }}">Дэлгэрэнгүй</a>
+      </div></div>
+      {% else %}<p>Илэрц олдсонгүй.</p>{% endfor %}
+    </div>
+  </div>
+</div>{% endblock %}

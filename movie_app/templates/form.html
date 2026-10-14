@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block c %}
+<h2>{{ title }}</h2>
+<form method="post" enctype="multipart/form-data" class="card card-body" style="max-width:560px">
+  {% for n,l,t,v in fields %}
+  <label class="mt-2">{{ l }}</label>
+  <input class="form-control" name="{{ n }}" type="{{ t }}" {% if t!='file' %}value="{{ v }}"{% else %}accept="image/*"{% endif %} {% if n in ('title','name') %}required{% endif %}>
+  {% endfor %}
+  <button class="btn btn-primary mt-3 align-self-start">Хадгалах</button>
+</form>{% endblock %}

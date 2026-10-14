@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% block c %}
+<div class="row">
+  <div class="col-md-4"><img class="img-fluid" src="{{ img_url(p.image) }}" alt=""></div>
+  <div class="col-md-8">
+    <h1 class="fw-bold">{{ p.name }}</h1><p>Төрсөн он: {{ p.born or '-' }}</p>
+    {% if user and user.role=='admin' %}
+    <div class="mb-3 d-flex gap-2">
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('person_form', n=p.name) }}">Засах</a>
+      <form method="post" action="{{ url_for('person_delete', n=p.name) }}" onsubmit="return confirm('Устгах уу?')">
+        <button class="btn btn-sm btn-danger">Устгах</button></form>
+    </div>{% endif %}
+    {% for k,label in DONE.items() %}{% if groups[k] %}
+      <h4 class="mt-4">{{ label }}</h4>
+      <div class="list-group">
+        {% for f in groups[k] %}<a class="list-group-item list-group-item-action" href="{{ url_for('movie', t=f.title) }}">
+          {{ f.title }} ({{ f.year }}){% if f.roles %} — {{ f.roles|join(', ') }}{% endif %}</a>{% endfor %}
+      </div>
+    {% endif %}{% endfor %}
+  </div>
+</div>{% endblock %}
